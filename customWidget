@@ -1,0 +1,71 @@
+<?php
+/* Plugin Name: Custom Widget
+  Description: Widget for adding page content in sidebars
+  Version: 1.0
+  Author: Mariam Mosinyan
+  Author URI: mariammosinyan@gmail.com
+ */
+
+class customWidget extends WP_Widget {
+
+    function customWidget() {
+        $widget_ops = array(
+            'classname' => 'customWidget',
+            'description' => 'Widget for home page about section'
+        );
+
+        $this->WP_Widget(
+                'customWidget', 'IDs for pages That must be shown', $widget_ops
+        );
+    }
+
+    function widget($args, $instance) { // widget sidebar output
+        extract($args, EXTR_SKIP);
+        echo $before_widget; // pre-widget code from theme
+        $output = '';
+        $pageId = $instance['id'];
+        $post = get_page($pageId);
+        echo '<h4>' .get_the_title($post->ID). '</h4>';
+        $output .= '<div class="one-third first">';
+        $output = apply_filters('the_content', $post->post_content);
+        $output .= '</div>';
+        echo $output;
+        
+        echo $after_widget; // post-widget code from theme
+    }
+
+    public function form($instance) {
+
+        $pageId = (isset($instance['id'])) ? $instance['id'] : '';
+        ?>
+
+        <p>
+
+            <label
+
+                for="<?php echo $this->get_field_id('id'); ?>"
+
+                ><?php _e('Page ID:'); ?></label> 
+
+            <input
+
+                id="<?php echo $this->get_field_id('id'); ?>"
+
+                class="widefat"
+
+                name="<?php echo $this->get_field_name('id'); ?>"
+
+                type="text"
+
+                value="<?php echo esc_attr($pageId); ?>">
+
+        </p>
+        <?php
+    }
+
+}
+
+add_action(
+        'widgets_init', create_function('', 'return register_widget("customWidget");')
+);
+?>
